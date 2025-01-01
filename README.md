@@ -55,7 +55,22 @@ static Future<void> _initializeAwsData() async {
     _client.keepAlivePeriod = 200;
     _client.setProtocolV311();
     _client.logging(on: false);
+/// Initializes AWS IoT Core connection parameters and loads certificates.
+/// This is called only once during app lifecycle.
+static Future<void> _initializeAwsData() async {
+  if (_onlyOnce) {
+    _onlyOnce = false;
+    
+    // Configure MQTT client
+    _client = MqttServerClient.withPort(_endpoint, _clientId, _port);
+    _client.secure = true;
+    _client.keepAlivePeriod = 200;
+    _client.setProtocolV311();
+    _client.logging(on: false);
 
+    // Load root CA certificate
+    _clientAuthorities = await rootBundle.load('assets/aws_root/AmazonRootCA1.pem');
+    _context.setTrustedCertificatesBytes(_clientAuthorities.buffer.asUint8List());
     // Load root CA certificate
     _clientAuthorities = await rootBundle.load('assets/aws_root/AmazonRootCA1.pem');
     _context.setTrustedCertificatesBytes(_clientAuthorities.buffer.asUint8List());
@@ -63,7 +78,13 @@ static Future<void> _initializeAwsData() async {
     // Load device certificate
     _certificateChain = await rootBundle.load('assets/aws_root/Device certificate.pem.crt');
     _context.useCertificateChainBytes(_certificateChain.buffer.asUint8List());
+    // Load device certificate
+    _certificateChain = await rootBundle.load('assets/aws_root/Device certificate.pem.crt');
+    _context.useCertificateChainBytes(_certificateChain.buffer.asUint8List());
 
+    // Load private key
+    _privateKey = await rootBundle.load('assets/aws_root/private.pem.key');
+    _context.usePrivateKeyBytes(_privateKey.buffer.asUint8List());
     // Load private key
     _privateKey = await rootBundle.load('assets/aws_root/private.pem.key');
     _context.usePrivateKeyBytes(_privateKey.buffer.asUint8List());
