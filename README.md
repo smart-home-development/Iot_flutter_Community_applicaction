@@ -43,8 +43,6 @@ We are in the early stages of development and welcome contributors to help shape
 
 Example aws mqtt class
 ``` dart
-// ignore_for_file: avoid_print
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
